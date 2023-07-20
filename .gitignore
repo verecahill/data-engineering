@@ -4,3 +4,5 @@ venv
 .vscode
 
 data/tlc_trip_record
+
+.env
