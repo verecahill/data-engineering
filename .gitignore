@@ -6,3 +6,5 @@ venv
 data/tlc_trip_record
 
 .env
+
+mlruns
