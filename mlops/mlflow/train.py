@@ -13,8 +13,7 @@ def objective(trial):
 
   trial.suggest_int("n_estimators", 100, 1000, step=100)
   trial.suggest_int("max_depth", 3, 10)
-
-  
+ 
   run_name = f"{UNIQUE_PREFIX}-{trial.number}"
   with mlflow.start_run(run_name=run_name):
 
@@ -46,6 +45,29 @@ def objective(trial):
     mlflow.log_metric("accuracy", acc_score)
   return acc_score
 
+def train_best_model(params):
+    run_name = f"{UNIQUE_PREFIX}-best-model"
+    with mlflow.start_run(run_name=run_name):
+
+      # log parameter
+
+      mlflow.log_params(params)
+      
+      # load data
+
+      iris = load_iris(as_frame=True)
+      X, y = iris["data"], iris["target"]
+
+      # train model
+
+      clf = RandomForestClassifier(
+          n_estimators=params["n_estimators"], 
+          max_depth=params["max_depth"], 
+          random_state=2024)
+      clf.fit(X, y)
+      return clf
+
+
 if __name__ == "__main__":
 
   # set mlflow
@@ -59,3 +81,6 @@ if __name__ == "__main__":
 
   # optimaze
   study.optimize(objective, n_trials=5)
+
+  best_params = study.best_params
+  best_clf = train_best_model(best_params)
