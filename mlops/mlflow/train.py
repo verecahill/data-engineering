@@ -1,3 +1,4 @@
+import os
 import uuid
 import optuna
 import mlflow
@@ -9,8 +10,13 @@ from sklearn.metrics import accuracy_score
 from minio import Minio
 
 UNIQUE_PREFIX = str(uuid.uuid4())[:8]
-BUCKET_NAME = "datalake"
+BUCKET_NAME = "mlflow"
 OBJECT_NAME = "iris"
+
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://0.0.0.0:9000"
+os.environ["MLFLOW_TRACKING_URI"] = "http://0.0.0.0:5001"
+os.environ["AWS_ACCESS_KEY_ID"] = "minio"
+os.environ["AWS_SECRET_ACCESS_KEY"] = "miniostorage"
 
 def download_data():
   # minio client
@@ -95,6 +101,8 @@ def train_best_model(params):
           max_depth=params["max_depth"], 
           random_state=2024)
       clf.fit(X, y)
+
+      mlflow.sklearn.log_model(sk_model=clf, artifact_path="best_model")
       return clf
 
 
@@ -102,7 +110,6 @@ if __name__ == "__main__":
 
   # set mlflow
   study_name = "iris_RandomForest"
-  mlflow.set_tracking_uri("http://localhost:5001")
   mlflow.set_experiment(study_name)
 
   # study

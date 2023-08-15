@@ -17,7 +17,7 @@ secret_key = "miniostorage"
 client = Minio(url, access_key=access_key, secret_key=secret_key, secure=False)
 
 # upload data to minio
-bucket_name = "datalake"
+bucket_name = "mlflow"
 object_name = "iris"
 if not client.bucket_exists(bucket_name):
     client.make_bucket(bucket_name)
