@@ -21,13 +21,19 @@ docker run -p 9000:9000 -p 9001:9001 -e MINIO_ROOT_USER=minio -e MINIO_ROOT_PASS
 
 ## Docker compose
 
-```
-docker compose up -d --build
-http://localhost:5001
-```
-
 - mlflow : ML Lifecycle Management, Model Registry
 
 - minio : Artifact Store, Data Versioning
 
 - postgres (Backend Store)
+
+## How to Start
+
+```
+docker compose --build
+docker compose up -d
+http://localhost:5001
+python upload_data_minio.py
+python train.py
+python mlflow_load_model.py --run-id {run_id in mlflow}
+```
