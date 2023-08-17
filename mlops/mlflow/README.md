@@ -47,4 +47,12 @@ python predict --run-id {your trained model run_id}
 docker build -t batch_predict -f batch.Dockerfile .
 docker network ls
 docker run --network mlflow_default batch-serving {your run-id}
+
+# predict with downloaded model
+python download_model.py --run-id {your run_id}
+python image_batch_predict.py
+
+# predict with docker container using a downloaded model
+docker build -t image-batch-predict -f image_batch.Dockerfile .
+docker run --network mlflow_default image-batch-predict
 ```
