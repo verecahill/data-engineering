@@ -4,17 +4,18 @@ import pandas as pd
 from minio import Minio
 
 # mlflow environment
-os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://0.0.0.0:9000"
-os.environ["MLFLOW_TRACKING_URI"] = "http://0.0.0.0:5001"
-os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://0.0.0.0:9000"
-os.environ["MLFLOW_TRACKING_URI"] = "http://0.0.0.0:5001"
+# os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://0.0.0.0:9000"
+# os.environ["MLFLOW_TRACKING_URI"] = "http://0.0.0.0:5001"
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://mlflow-artifact-store:9000"
+os.environ["MLFLOW_TRACKING_URI"] = "http://mlflow-server:5000"
 os.environ["AWS_ACCESS_KEY_ID"] = "minio"
 os.environ["AWS_SECRET_ACCESS_KEY"] = "miniostorage"
 
 def predict(run_id, model_name):
     clf = mlflow.pyfunc.load_model(f"runs:/{run_id}/{model_name}")
 
-    url = "0.0.0.0:9000"
+    # url = "0.0.0.0:9000"
+    url = "mlflow-artifact-store:9000"
     access_key = "minio"
     secret_key = "miniostorage"
     client = Minio(url, access_key=access_key, secret_key=secret_key, secure=False)

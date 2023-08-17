@@ -2,6 +2,8 @@ import os
 import uuid
 import optuna
 import mlflow
+import dill
+import textwrap
 import pandas as pd
 # from sklearn.datasets import load_iris
 from sklearn.ensemble import RandomForestClassifier
@@ -17,6 +19,16 @@ os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://0.0.0.0:9000"
 os.environ["MLFLOW_TRACKING_URI"] = "http://0.0.0.0:5001"
 os.environ["AWS_ACCESS_KEY_ID"] = "minio"
 os.environ["AWS_SECRET_ACCESS_KEY"] = "miniostorage"
+
+
+class CustomModel:
+  def __init__(self, clf):
+    self.clf = clf
+
+  def predict(self, X):
+    X_pred = self.clf.predict(X)
+    X_pred_df = pd.Series(X_pred).map({0: "virginica", 1: "setosa", 2:"versicolor"})
+    return X_pred_df
 
 def download_data():
   # minio client
@@ -102,7 +114,35 @@ def train_best_model(params):
           random_state=2024)
       clf.fit(X, y)
 
-      mlflow.sklearn.log_model(sk_model=clf, artifact_path="best_model")
+      my_model = CustomModel(clf)
+
+      # mlflow.sklearn.log_model(sk_model=clf, artifact_path="best_model")
+      with open("model.dill", "wb") as f:
+        dill.dump(my_model, f)
+        
+
+      with open("loader.py", "w") as f:
+        f.write(
+          textwrap.dedent(
+"""
+import os
+import dill
+
+def _load_pyfunc(path):
+  if os.path.isdir(path):
+    path = os.path.join(path, "model.dill")
+  with open(path, "rb") as f:
+    return dill.load(f)
+"""
+          )
+        )
+
+      mlflow.pyfunc.log_model(
+        artifact_path="best_model",
+        data_path="model.dill",
+        loader_module="loader",
+        code_path=["loader.py"],
+      )
       return clf
 
 
