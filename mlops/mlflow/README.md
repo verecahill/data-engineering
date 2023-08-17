@@ -55,4 +55,12 @@ python image_batch_predict.py
 # predict with docker container using a downloaded model
 docker build -t image-batch-predict -f image_batch.Dockerfile .
 docker run --network mlflow_default image-batch-predict
+
+# api serving
+cd fastapi
+uvicorn app:app --reload --host 0.0.0.0
+
+# api serving with docker
+docker build -t api-serving -f api.Dockerfile .
+docker run -p 8000:8000 api-serving
 ```

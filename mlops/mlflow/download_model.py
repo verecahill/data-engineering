@@ -6,6 +6,9 @@ os.environ["MLFLOW_TRACKING_URI"] = "http://0.0.0.0:5001"
 os.environ["AWS_ACCESS_KEY_ID"] = "minio"
 os.environ["AWS_SECRET_ACCESS_KEY"] = "miniostorage"
 
+def download_model(run_id, model_name):
+    mlflow.artifacts.download_artifacts(run_id=run_id, artifact_path=model_name, dst_path="./downloads/")
+
 if __name__ == "__main__":
     from argparse import ArgumentParser
 
@@ -14,4 +17,4 @@ if __name__ == "__main__":
     parser.add_argument("--model-name", type=str, default="best_model")
     args = parser.parse_args()
 
-    mlflow.artifacts.download_artifacts(run_id=args.run_id, artifact_path=args.model_name, dst_path="./downloads")
+    download_model(args.run_id, args.model_name)

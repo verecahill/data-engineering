@@ -26,6 +26,7 @@ class CustomModel:
     self.clf = clf
 
   def predict(self, X):
+    import pandas as pd
     X_pred = self.clf.predict(X)
     X_pred_df = pd.Series(X_pred).map({0: "virginica", 1: "setosa", 2:"versicolor"})
     return X_pred_df
